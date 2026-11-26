@@ -254,6 +254,14 @@ which is which. Tested by a user with two LevelControl sensors (Combi 6): level 
 contents match the panel (e.g. 96 % = 10.6 kg on an 11 kg bottle). Reports with other
 setups are welcome as an issue.
 
+### Truma Aventa Compact Plus 2nd gen (air conditioner)
+
+[`aventa-compact-plus-2.example.yaml`](aventa-compact-plus-2.example.yaml) is a
+complete configuration for the Aventa Compact Plus 2nd gen at address `0x0801`: climate with
+heat, cool, auto, fan and dry, fan level, ambient light (on/off and brightness), mains
+connection and diagnostics. Heating through the Aventa needs v0.8.5 or newer. Contributed and
+tested by a user (Aventa firmware 1.10.5, panel 3.5.38) – thanks!
+
 ### Custom actions in Home Assistant
 
 ```yaml

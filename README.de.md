@@ -260,6 +260,14 @@ LevelControl (Combi 6) getestet: Füllstand und Inhalt stimmen mit dem Panel üb
 (z. B. 96 % = 10,6 kg bei einer 11-kg-Flasche). Rückmeldungen mit anderen Ausstattungen
 gern als Issue.
 
+### Truma Aventa Compact Plus 2. Generation (Klimaanlage)
+
+[`aventa-compact-plus-2.example.yaml`](aventa-compact-plus-2.example.yaml) ist eine
+komplette Konfiguration für das Aventa Compact Plus 2. Gen. unter Adresse `0x0801`: Klima mit
+Heizen, Kühlen, Automatik, Lüften und Entfeuchten, Lüfterstufe, Ambientebeleuchtung (Ein/Aus und
+Helligkeit), Netzanschluss und Diagnose. Heizen über das Aventa braucht v0.8.5 oder neuer.
+Beigesteuert und getestet von einem Nutzer (Aventa-Firmware 1.10.5, Panel 3.5.38) – danke!
+
 ### Eigene Aktionen in Home Assistant
 
 ```yaml

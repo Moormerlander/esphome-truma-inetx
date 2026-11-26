@@ -5,6 +5,8 @@
   climate's `appliance_address` is `0x0801` (Truma Aventa Compact Plus 2nd gen); all other
   appliances keep mode 3. Contributed in PR #4, tested with Aventa firmware 1.10.5 and panel
   3.5.38.
+- New example `aventa-compact-plus-2.example.yaml` for the Aventa Compact Plus 2nd gen
+  (climate, fan level, ambient light, mains connection), contributed in PR #5.
 - The example YAML loads the tag `v0.8.5`.
 
 ## 0.8.4
