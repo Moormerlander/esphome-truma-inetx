@@ -8,7 +8,7 @@ spricht nur noch per ESPHome-API über WLAN mit dem ESP.
 
 Damit entfallen die HA-Integration `truma_inetx` und der Bluetooth-Proxy.
 
-> **Status: öffentliche Beta 0.8.5 (November 2026) – Tester gesucht!**
+> **Status: öffentliche Beta 0.8.6 (November 2026) – Tester gesucht!**
 > Getestet an einem iNet X Pro Panel (Software 3.4.27) mit Combi 6 und Schaudt EBL, von Testern
 > auch mit Panel-Software 3.5.38, Combi D 4 GEN2, Aventa compact und Nordelettronica NE315 Gen2. Mit einem
 > **klassischen ESP32** (ESP32-D0WD) läuft die Verbindung stabil (Langzeittests über 30 Stunden).
@@ -235,8 +235,10 @@ nur die Verbindung zum Panel). Ist **„Frostschutz“** an, die Heizung aus und
 **Heizen 5 °C** (der niedrigste Sollwert des Panels) und vermerkt das im **„Frostschutz Status“**.
 Eine von Hand eingestellte Heizung wird nie verändert. In der Beispiel-YAML standardmäßig aus.
 
-**„Frostschutz Auto-Aus“** (standardmäßig aus): Hat der Frostschutz die Heizung eingeschaltet,
-schaltet der ESP sie wieder aus, sobald es innen 5 °C hat. Das spart Gas, weil der Innenraum im
+**„Frostschutz Auto-Aus“** (standardmäßig aus, wirkt nur zusammen mit „Frostschutz“): Steht die
+Heizung auf **Heizen mit 5 °C**, schaltet der ESP sie wieder aus, sobald es innen 5 °C hat – egal
+wer sie so eingestellt hat, auch nach einem Neustart. 5 °C gilt als Frostschutzbetrieb; ein
+höherer Sollwert ist echtes Heizen und bleibt unangetastet. Das spart Gas, weil der Innenraum im
 Mittel kälter bleibt – dafür springt die Heizung in kalten Nächten öfter an und aus. Der Status
 zeigt dann z. B. `Fertig 03:40 · 5.0 °C`.
 
@@ -265,7 +267,7 @@ gern als Issue.
 [`aventa-compact-plus-2.example.yaml`](aventa-compact-plus-2.example.yaml) ist eine
 komplette Konfiguration für das Aventa Compact Plus 2. Gen. unter Adresse `0x0801`: Klima mit
 Heizen, Kühlen, Automatik, Lüften und Entfeuchten, Lüfterstufe, Ambientebeleuchtung (Ein/Aus und
-Helligkeit), Netzanschluss und Diagnose. Heizen über das Aventa braucht v0.8.5 oder neuer.
+Helligkeit), Netzanschluss und Diagnose. Heizen über das Aventa braucht v0.8.6 oder neuer.
 Beigesteuert und getestet von einem Nutzer (Aventa-Firmware 1.10.5, Panel 3.5.38) – danke!
 
 ### Eigene Aktionen in Home Assistant

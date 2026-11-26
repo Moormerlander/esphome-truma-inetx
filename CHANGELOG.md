@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.6
+- Frost protection Auto Off now acts on every HEAT with a 5 °C set point (frost mode), no matter
+  who set it, also after a restart or after switching frost protection off and on. Before, the
+  ESP only switched off a heating it had started itself since its last restart. A higher set
+  point is still never touched.
+- Switching "Frost Protection" off and on no longer overwrites the last message
+  (`On 06:45 · -0.1 °C`, `Done …`); it only toggles between "Ready" and "Off".
+- The example YAML loads the tag `v0.8.6`.
+
 ## 0.8.5
 - Climate: HEAT is written as `RoomClimate.Mode` 4 (heating by the air conditioner) when the
   climate's `appliance_address` is `0x0801` (Truma Aventa Compact Plus 2nd gen); all other
