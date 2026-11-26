@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.5
+- Climate: HEAT is written as `RoomClimate.Mode` 4 (heating by the air conditioner) when the
+  climate's `appliance_address` is `0x0801` (Truma Aventa Compact Plus 2nd gen); all other
+  appliances keep mode 3. Contributed in PR #4, tested with Aventa firmware 1.10.5 and panel
+  3.5.38.
+- The example YAML loads the tag `v0.8.5`.
+
 ## 0.8.4
 - Fix: the frost protection lambda in the example YAML did not compile (`id()` of the climate
   is a pointer).

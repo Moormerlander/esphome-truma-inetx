@@ -387,7 +387,9 @@ class TrumaClimate : public climate::Climate, public TrumaListener {
         return climate::CLIMATE_MODE_OFF;
     }
   }
-  int32_t from_mode_(climate::ClimateMode m) {
+  // RoomClimate.Mode: 3 = heating by the heater, 4 = heating by the air conditioner
+  // (Aventa Compact Plus 2nd gen at 0x0801, PR #4).
+  int32_t from_mode_(climate::ClimateMode m) const {
     switch (m) {
       case climate::CLIMATE_MODE_AUTO:
         return 1;
