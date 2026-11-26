@@ -1,0 +1,457 @@
+# Truma Aventa Compact Plus 2nd generation example
+# Tested with v0.8.0 plus heating mode fix (PR #4).
+# Requires a patched components/truma_inetx directory next to this YAML.
+# Add the five referenced truma_inetx__* secrets to secrets.yaml.
+# No fixed IP required. No frost protection or custom web interface.
+
+packages:
+  language: github://Moormerlander/esphome-truma-inetx/lang/de.yaml@v0.8.0
+
+esphome:
+  name: truma-inetx
+  friendly_name: Truma iNet X
+  min_version: 2026.11.0
+
+  devices:
+    - id: truma_heizung
+      name: "Aventa Compact Plus 2"
+      relation: via
+    - id: truma_panel
+      name: "${truma_panel}"
+      relation: via
+
+esp32:
+  board: esp32dev          # classic ESP32 -- NOT C3/S3/C6, see README
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret truma_inetx__api_key
+
+ota:
+  - platform: esphome
+    password: !secret truma_inetx__ota_password
+
+wifi:
+  ssid: !secret truma_inetx__wifi_ssid
+  password: !secret truma_inetx__wifi_password
+  ap:
+    ssid: "Truma Fallback Hotspot"
+    password: !secret truma_inetx__fallback_password
+
+captive_portal:
+
+external_components:
+  # Use a local checkout containing the heating fix from PR #4.
+  # Once released upstream, replace this source with the corresponding release.
+  - source:
+      type: local
+      path: components
+    components: [truma_inetx]
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+esp32_ble_tracker:
+  scan_parameters:
+    active: true
+
+truma_inetx:
+  id: truma_hub
+  time_id: ha_time
+  user_name: "Home Assistant"
+  pairing_timeout: 120s
+  language: ${language}
+  privacy: false
+  # Optional: helped reconnection on the tested installation.
+  startup_delay: 90s
+
+binary_sensor:
+  - platform: truma_inetx
+    topic: AirCirculation
+    param: Active
+    address: 0x0801
+    on_values: [1]
+    name: "${air_circulation_active}"
+    device_id: truma_heizung
+    device_class: running
+  - platform: truma_inetx
+    type: connected
+    id: panel_connected
+    name: "${panel_connected}"
+    device_class: connectivity
+  - platform: truma_inetx
+    type: paired
+    name: "${panel_paired}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: AirHeating
+    param: Active
+    address: 0x0801
+    on_values: [1]
+    name: "${heating_active}"
+    device_id: truma_heizung
+    device_class: running
+  - platform: truma_inetx
+    topic: ErrorReset
+    param: ErrCode
+    name: "${fault}"
+    device_id: truma_panel
+    device_class: problem
+
+  - platform: truma_inetx
+    topic: AirCooling
+    param: Active
+    address: 0x0801
+    on_values: [1]
+    name: "Kühlung aktiv"
+    device_id: truma_heizung
+    device_class: running
+  - platform: truma_inetx
+    topic: AirDehumid
+    param: Active
+    address: 0x0801
+    on_values: [1]
+    name: "Entfeuchtung aktiv"
+    device_id: truma_heizung
+  - platform: truma_inetx
+    topic: LinePower
+    param: Plugged
+    address: 0x0801
+    name: "Aventa Netzanschluss"
+    device_id: truma_heizung
+    device_class: plug
+
+text_sensor:
+  - platform: truma_inetx
+    format: firmware
+    address: 0x0101
+    name: "${panel_firmware}"
+    device_id: truma_panel
+    entity_category: diagnostic
+  - platform: truma_inetx
+    format: firmware
+    address: 0x0801
+    name: "Aventa Firmware"
+    device_id: truma_heizung
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: TimeAndDate
+    param: Time
+    address: 0x0101
+    name: "${panel_time}"
+    device_id: truma_panel
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: TimeAndDate
+    param: Date
+    address: 0x0101
+    name: "${panel_date}"
+    device_id: truma_panel
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: version
+    name: "${firmware_version}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: last_disconnect
+    name: "${last_disconnect}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: link_params
+    name: "${radio_link}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: status
+    name: "${connection_status}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: ErrorReset
+    param: ErrCode
+    name: "${error_codes}"
+    device_id: truma_panel
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: BleDeviceManagement
+    param: NrFreeSlots
+    address: 0x0601
+    name: "${ble_free_slots}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: BleDeviceManagement
+    param: State
+    address: 0x0601
+    name: "${ble_module_state}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: BleDeviceManagement
+    param: BleConnState
+    address: 0x0601
+    name: "${ble_module_connection_state}"
+    entity_category: diagnostic
+button:
+  - platform: truma_inetx
+    type: sync_time
+    name: "${set_panel_clock}"
+    device_id: truma_panel
+    entity_category: config
+  - platform: truma_inetx
+    type: pair
+    name: "${pair_panel}"
+    entity_category: config
+  - platform: truma_inetx
+    type: unpair
+    name: "${remove_pairing}"
+    entity_category: config
+  - platform: truma_inetx
+    type: reconnect
+    name: "${reconnect}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: dump
+    name: "${dump_all_parameters_to_log}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: log_raw
+    name: "${log_raw_messages}"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    type: write
+    topic: ErrorReset
+    param: Req
+    value: 1
+    name: "${reset_fault}"
+    device_id: truma_panel
+climate:
+  - platform: truma_inetx
+    id: truma_climate
+    name: "Truma Aventa Compact Plus 2"
+    device_id: truma_heizung
+    appliance_address: 0x0801
+    supported_modes:
+      - HEAT
+      - FAN_ONLY
+      - COOL
+      - AUTO
+      - DRY
+
+sensor:
+  - platform: truma_inetx
+    topic: AirHeating
+    param: Temp
+    id: room_temp
+    address: 0x0801
+    name: "${room_temperature}"
+    device_id: truma_heizung
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: truma_inetx
+    topic: Temperature
+    param: Internal
+    address: 0x0101
+    name: "${panel_temperature}"
+    device_id: truma_panel
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: truma_inetx
+    topic: Eol
+    param: Vcc12
+    address: 0x0101
+    name: "${panel_supply_voltage}"
+    device_id: truma_panel
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 2
+    entity_category: diagnostic
+    filters:
+      - multiply: 0.001
+  - platform: truma_inetx
+    topic: PowerMgmt
+    param: PwrMode
+    address: 0x0101
+    name: "${panel_power_mode}"
+    device_id: truma_panel
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: Panel
+    param: UserInactiveSince
+    address: 0x0101
+    name: "${panel_idle_since}"
+    device_id: truma_panel
+    unit_of_measurement: "s"
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: AirHeating
+    param: TgtTemp
+    address: 0x0801
+    name: "${heater_target_temperature}"
+    device_id: truma_heizung
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: truma_inetx
+    topic: RoomClimate
+    param: TgtTemp
+    address: 0x0101
+    name: "${room_climate_target_temperature}"
+    device_id: truma_heizung
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: wifi_signal
+    name: "${wifi_signal}"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: truma_inetx
+    topic: AirCooling
+    param: Temp
+    address: 0x0801
+    name: "Aventa Isttemperatur Kühlung"
+    device_id: truma_heizung
+    unit_of_measurement: "°C"
+    device_class: temperature
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: truma_inetx
+    topic: AirCooling
+    param: TgtTemp
+    address: 0x0801
+    name: "Aventa Solltemperatur Kühlung"
+    device_id: truma_heizung
+    unit_of_measurement: "°C"
+    device_class: temperature
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: truma_inetx
+    topic: AirCirculation
+    param: FanLevel
+    address: 0x0801
+    name: "Aventa Lüfterstufe"
+    device_id: truma_heizung
+
+  - platform: truma_inetx
+    topic: RoomClimate
+    param: Mode
+    address: 0x0101
+    name: "Aventa Betriebsmodus Rohwert"
+    device_id: truma_heizung
+    entity_category: diagnostic
+  - platform: truma_inetx
+    topic: AmbientLight
+    param: LightStep
+    address: 0x0801
+    name: "Aventa Lichtstufe Rohwert"
+    device_id: truma_heizung
+  - platform: truma_inetx
+    topic: AmbientLight
+    param: Active
+    address: 0x0801
+    name: "Aventa Lichtstatus Rohwert"
+    device_id: truma_heizung
+
+  - platform: truma_inetx
+    topic: AirHeating
+    param: Active
+    address: 0x0801
+    name: "Aventa Heizstatus Rohwert"
+    device_id: truma_heizung
+    entity_category: diagnostic
+
+select:
+  - platform: truma_inetx
+    topic: AirCirculation
+    param: FanLevel
+    address: 0x0801
+    name: "Aventa Lüftersteuerung"
+    device_id: truma_heizung
+    icon: mdi:fan
+    options:
+      1: "Niedrig"
+      2: "Mittel"
+      3: "Hoch"
+
+number:
+  # Configured brightness range; actual limits may depend on firmware.
+  - platform: truma_inetx
+    topic: AmbientLight
+    param: LightStep
+    address: 0x0801
+    name: "Aventa Helligkeit"
+    device_id: truma_heizung
+    icon: mdi:brightness-6
+    min_value: 0
+    max_value: 100
+    step: 1
+    mode: slider
+  - platform: truma_inetx
+    topic: Panel
+    param: Intst
+    address: 0x0101
+    name: "${display_brightness}"
+    device_id: truma_panel
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 1
+    entity_category: config
+  - platform: truma_inetx
+    topic: Panel
+    param: DarkIntst
+    address: 0x0101
+    name: "${display_brightness_dark}"
+    device_id: truma_panel
+    min_value: 0
+    max_value: 100
+    step: 1
+    entity_category: config
+  - platform: truma_inetx
+    topic: Panel
+    param: DisplayTimeout
+    address: 0x0101
+    name: "${display_timeout}"
+    device_id: truma_panel
+    unit_of_measurement: "s"
+    min_value: 10
+    max_value: 600
+    step: 10
+    entity_category: config
+switch:
+  - platform: truma_inetx
+    topic: AmbientLight
+    param: Active
+    address: 0x0801
+    name: "Aventa Ambientebeleuchtung"
+    device_id: truma_heizung
+    icon: mdi:lightbulb
+    on_value: 1
+    off_value: 0
+  - platform: truma_inetx
+    topic: Panel
+    param: Screensaver
+    address: 0x0101
+    name: "${screensaver}"
+    device_id: truma_panel
+    entity_category: config
