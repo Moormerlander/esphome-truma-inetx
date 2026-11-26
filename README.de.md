@@ -339,6 +339,18 @@ Was die Tests abdecken:
 - Dauerhaft Status 0x3E / `connect failed` nach einer Trennung oder nach dem Flashen:
   Panel stromlos machen. Nur wenn der Status danach „Panel lehnt den ESP ab“ zeigt, neu koppeln
   (siehe „Neu koppeln Schritt für Schritt“).
+- **Kopplungsfenster schließt mit „no Truma panel was heard at all“**, und im Log steht nie
+  eine Zeile `Truma advertisement from …`: Der ESP empfängt vom Panel gar nichts.
+  1. **ESP nicht neben den WLAN-Router legen.** Dessen Antennen senden auf 2,4 GHz, derselben
+     Frequenz wie Bluetooth, und übertönen das schwache Panel-Signal. Ein WLAN-Signal von
+     −50 bis −70 dBm ist ideal; −15 dBm heißt, der ESP liegt direkt am Router.
+  2. Nichts anderes darf mit dem Panel verbunden sein: Truma-App auf allen Handys schließen,
+     alte hass-truma-inetx-Integration oder BLE-Proxy entfernen.
+  3. Panel in den Modus „Gerät hinzufügen“ bringen, dann „Panel koppeln“ drücken (120 s).
+  4. Mit einer BLE-Scanner-App (z. B. nRF Connect) prüfen, ob das Panel sendet
+     (`Truma iNetX-xxxxxx`). Sieht das Handy es, der ESP aber selbst direkt am Panel nicht,
+     **ist sehr wahrscheinlich das Bluetooth des Boards defekt – anderes Board versuchen.**
+     Genau das hatte ein Tester: Ein neues Board gleichen Typs koppelte sofort.
 - `the panel assigned no address` direkt nach Panel-Neustart: normal, verschwindet nach ca. 1–2 Minuten.
 
 ---

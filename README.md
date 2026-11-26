@@ -332,6 +332,18 @@ What the tests cover:
 - Permanent status 0x3E / `connect failed` after a disconnect or after flashing:
   power-cycle the panel. Only if the status then says "Panel rejects this device", pair again
   (see "Re-pairing step by step").
+- **Pairing window closed: "no Truma panel was heard at all"**, and the log never shows a line
+  `Truma advertisement from …`: the ESP receives nothing from the panel.
+  1. **Keep the ESP away from the WiFi router.** Its antennas transmit on 2.4 GHz, the same
+     band as Bluetooth, and drown out the panel's weak signal. A WiFi signal of −50 to −70 dBm
+     is ideal; −15 dBm means the ESP sits right next to the router.
+  2. Nothing else may be connected to the panel: close the Truma app on all phones and remove
+     any old hass-truma-inetx integration or BLE proxy.
+  3. Put the panel into add-device mode, then press "Pair Panel" (120 s window).
+  4. Check with a BLE scanner app (e.g. nRF Connect) that the panel advertises
+     (`Truma iNetX-xxxxxx`). If the phone sees it but the ESP doesn't, even right next to the
+     panel, **the board's Bluetooth is likely faulty – try another board.** A tester had exactly
+     that: a new board of the same type paired immediately.
 - `the panel assigned no address` right after a panel restart: normal, goes away after
   about 1–2 minutes.
 
