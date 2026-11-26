@@ -8,7 +8,7 @@ spricht nur noch per ESPHome-API über WLAN mit dem ESP.
 
 Damit entfallen die HA-Integration `truma_inetx` und der Bluetooth-Proxy.
 
-> **Status: öffentliche Beta 0.8.2 (November 2026) – Tester gesucht!**
+> **Status: öffentliche Beta 0.8.4 (November 2026) – Tester gesucht!**
 > Getestet an einem iNet X Pro Panel (Software 3.4.27) mit Combi 6 und Schaudt EBL, von Testern
 > auch mit Panel-Software 3.5.38, Combi D 4 GEN2, Aventa compact und Nordelettronica NE315 Gen2. Mit einem
 > **klassischen ESP32** (ESP32-D0WD) läuft die Verbindung stabil (Langzeittests über 30 Stunden).
@@ -234,6 +234,11 @@ nur die Verbindung zum Panel). Ist **„Frostschutz“** an, die Heizung aus und
 10 Minuten lang unter der **„Frostschutz-Schwelle“** (Standard 5 °C), stellt er die Heizung auf
 **Heizen 5 °C** (der niedrigste Sollwert des Panels) und vermerkt das im **„Frostschutz Status“**.
 Eine von Hand eingestellte Heizung wird nie verändert. In der Beispiel-YAML standardmäßig aus.
+
+**„Frostschutz Auto-Aus“** (standardmäßig aus): Hat der Frostschutz die Heizung eingeschaltet,
+schaltet der ESP sie wieder aus, sobald es innen 5 °C hat. Das spart Gas, weil der Innenraum im
+Mittel kälter bleibt – dafür springt die Heizung in kalten Nächten öfter an und aus. Der Status
+zeigt dann z. B. `Fertig 03:40 · 5.0 °C`.
 
 Beim Einwintern, wenn die Heizung aus bleiben soll, ausschalten. Warnen, wenn die Verbindung zum
 Panel, das Gas oder die Batterie ausfällt, kann der ESP nicht – das gehört in Home Assistant,

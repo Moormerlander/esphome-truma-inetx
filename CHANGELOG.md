@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.4
+- Fix: the frost protection lambda in the example YAML did not compile (`id()` of the climate
+  is a pointer).
+- The example YAML loads the tag `v0.8.4`.
+
+## 0.8.3
+- New switch "Frost Protection Auto Off" (off by default): when frost protection has switched
+  the heater on, the ESP switches it off again once the room reaches 5 °C. Saves gas; the heater
+  cycles instead. Status then shows `Done HH:MM · x.x °C`. If the heating is changed by hand
+  (mode or set point), the ESP leaves it alone.
+- The example YAML loads the tag `v0.8.3`.
+
 ## 0.8.2
 - Shorter "Frost Protection Status" text so it fits a dashboard tile: `Ein 16:16 · 4.4 °C`
   (EN: `On 16:16 · 4.4 °C`) instead of `25.11. 16:16: eingeschaltet bei 4.4 °C`. The date is

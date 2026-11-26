@@ -12,7 +12,7 @@
 # alle Entitätsnamen, die Gerätenamen und die Statustexte um.
 
 packages:
-  language: github://Moormerlander/esphome-truma-inetx/lang/de.yaml@v0.8.2
+  language: github://Moormerlander/esphome-truma-inetx/lang/de.yaml@v0.8.4
   # Without GitHub access / ohne GitHub: put lang/de.yaml next to this file and use
   #   language: !include lang/de.yaml
 
@@ -69,7 +69,7 @@ captive_portal:
 
 # --- Truma iNet X ---------------------------------------------------------
 external_components:
-  - source: github://Moormerlander/esphome-truma-inetx@v0.8.2
+  - source: github://Moormerlander/esphome-truma-inetx@v0.8.4
     components: [truma_inetx]
   # Local instead of GitHub: put the "components" folder next to this file and use
   #   - source: { type: local, path: components }
@@ -748,19 +748,33 @@ switch:
       - text_sensor.template.publish:
           id: frost_status
           state: "${frost_off}"
+  - platform: template
+    id: frost_auto_off
+    name: "${frost_auto_off}"
+    device_id: truma_heizung
+    icon: mdi:fire-off
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
 
 # ---------------------------------------------------------------------------
 # Frost protection / Frostschutz: if the heater is off and the room temperature
 # stays below the threshold for 10 minutes, the ESP sets the heater to HEAT 5 °C.
 # Works without Home Assistant (needs the panel link). Only acts while the heater
-# is off – a heating set by hand is never touched. Turn "${frost_guard}" off when the
-# vehicle is winterized and the heater is meant to stay off.
+# is off – a heating set by hand is never touched.
+# With "Auto Off" on, the ESP switches the heater off again once the room reaches
+# 5 °C (only a heating it started itself) – saves gas, the heater cycles instead.
+# Turn "${frost_guard}" off when the vehicle is winterized and the heater is meant to stay off.
 # ---------------------------------------------------------------------------
 globals:
   - id: frost_minutes
     type: int
     restore_value: no
     initial_value: "0"
+  - id: frost_active
+    type: bool
+    restore_value: no
+    initial_value: "false"
 
 interval:
   - interval: 60s
@@ -769,7 +783,33 @@ interval:
           if (id(frost_status).state.empty())
             id(frost_status).publish_state(id(frost_guard).state ? "${frost_ready}" : "${frost_off}");
           const float t = id(room_temp).state;
-          const bool heater_off = id(truma_climate).mode == climate::CLIMATE_MODE_OFF;
+          auto *cl = id(truma_climate);
+          const bool heater_off = cl->mode == climate::CLIMATE_MODE_OFF;
+          auto stamp = [&](const char *word) {
+            char buf[64];
+            auto now = id(ha_time).now();
+            if (now.is_valid())
+              snprintf(buf, sizeof(buf), "%s %02d:%02d · %.1f °C", word, now.hour, now.minute, t);
+            else
+              snprintf(buf, sizeof(buf), "%s · %.1f °C", word, t);
+            id(frost_status).publish_state(buf);
+          };
+          // Heating started by frost protection: optionally switch it off again once 5 °C is reached.
+          if (id(frost_active)) {
+            if (!id(frost_guard).state || cl->mode != climate::CLIMATE_MODE_HEAT ||
+                std::fabs(cl->target_temperature - 5.0f) > 0.05f) {
+              id(frost_active) = false;  // changed by hand -> hands off
+            } else if (id(frost_auto_off).state && id(panel_connected).state && !std::isnan(t) && t >= 5.0f) {
+              ESP_LOGW("frost", "Frost protection: %.1f °C reached -> heater OFF", t);
+              auto call = cl->make_call();
+              call.set_mode(climate::CLIMATE_MODE_OFF);
+              call.perform();
+              id(frost_active) = false;
+              id(frost_minutes) = 0;
+              stamp("${frost_done}");
+            }
+            return;
+          }
           if (!id(frost_guard).state || !id(panel_connected).state || std::isnan(t) || !heater_off ||
               t >= id(frost_threshold).state) {
             id(frost_minutes) = 0;
@@ -779,14 +819,9 @@ interval:
             return;
           id(frost_minutes) = 0;
           ESP_LOGW("frost", "Frost protection: %.1f °C with the heater off -> HEAT 5 °C", t);
-          auto call = id(truma_climate).make_call();
+          auto call = cl->make_call();
           call.set_mode(climate::CLIMATE_MODE_HEAT);
           call.set_target_temperature(5.0f);
           call.perform();
-          char buf[64];
-          auto now = id(ha_time).now();
-          if (now.is_valid())
-            snprintf(buf, sizeof(buf), "${frost_switched_on} %02d:%02d · %.1f °C", now.hour, now.minute, t);
-          else
-            snprintf(buf, sizeof(buf), "${frost_switched_on} · %.1f °C", t);
-          id(frost_status).publish_state(buf);
+          id(frost_active) = true;
+          stamp("${frost_switched_on}");

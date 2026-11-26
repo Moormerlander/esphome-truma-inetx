@@ -8,7 +8,7 @@ the ESP via the ESPHome API over WiFi.
 
 No Home Assistant integration (`truma_inetx`) and no Bluetooth proxy needed.
 
-> **Status: public beta 0.8.2 (November 2026) – testers wanted!**
+> **Status: public beta 0.8.4 (November 2026) – testers wanted!**
 > Tested with an iNet X Pro panel (software 3.4.27), a Combi 6 heater and a Schaudt EBL; by testers
 > also with panel software 3.5.38, Combi D 4 GEN2, Aventa compact and a Nordelettronica NE315 Gen2.
 > With a **classic ESP32** (ESP32-D0WD) the connection is stable (long-term tests of 30 hours
@@ -230,6 +230,11 @@ needs the link to the panel). With **"Frost Protection"** on, the heater off and
 temperature below **"Frost Protection Threshold"** (default 5 °C) for 10 minutes, it sets the
 heater to **HEAT 5 °C** (the lowest set point of the panel) and notes it in **"Frost Protection
 Status"**. A heating set by hand is never changed. Off by default in the example YAML.
+
+**"Frost Protection Auto Off"** (off by default): once frost protection has switched the heater
+on, the ESP switches it off again when the room reaches 5 °C. This saves gas because the room
+stays colder on average – in return the heater cycles on and off more often in cold nights. The
+status then shows e.g. `Done 03:40 · 5.0 °C`.
 
 Turn it off when the vehicle is winterized and the heater should stay off. The ESP cannot warn
 you when the panel link, the gas or the battery fails – do that in Home Assistant, e.g. a

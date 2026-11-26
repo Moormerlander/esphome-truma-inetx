@@ -87,3 +87,5 @@ substitutions:
   frost_ready: "Ready"
   frost_off: "Off"
   frost_switched_on: "On"
+  frost_auto_off: "Frost Protection Auto Off"
+  frost_done: "Done"
