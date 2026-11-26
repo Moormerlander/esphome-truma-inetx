@@ -10,7 +10,8 @@ Damit entfallen die HA-Integration `truma_inetx` und der Bluetooth-Proxy.
 
 > **Status: öffentliche Beta 0.8.6 (November 2026) – Tester gesucht!**
 > Getestet an einem iNet X Pro Panel (Software 3.4.27) mit Combi 6 und Schaudt EBL, von Testern
-> auch mit Panel-Software 3.5.38, Combi D 4 GEN2, Aventa compact und Nordelettronica NE315 Gen2. Mit einem
+> auch mit Panel-Software 3.5.38, Combi D 4 GEN2, Combi 4 D E, Aventa compact, Aventa Compact Plus
+> 2. Gen. und Nordelettronica NE315 Gen2. Mit einem
 > **klassischen ESP32** (ESP32-D0WD) läuft die Verbindung stabil (Langzeittests über 30 Stunden).
 > Der ESP32-C3 wird nicht unterstützt, siehe [Hardware](#hardware).
 >
@@ -134,6 +135,9 @@ Was bleibt, sind Eigenheiten des **Panels selbst**:
 ## Hardware
 
 - **Klassischer ESP32** (ESP32-WROOM / „ESP32 DevKit“, `board: esp32dev`)
+  Getestete Boards: ESP32 DevKit (ESP32-D0WD), ESP32-WROOM-32U mit externer Antenne,
+  AZ-Delivery D1 Mini ESP32 (ESP32-WROOM-32). Einzelne Boards können defektes Bluetooth
+  haben – siehe „Bei Problemen“.
 
 > **Wichtig:** Mit dem **ESP32-C3** (und vermutlich S3/C6) klappen Koppeln und Datenverbindung,
 > aber **keine Wiederverbindung** nach einem Abbruch. Der Bluetooth-Stack dieser Chips sucht

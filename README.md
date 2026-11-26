@@ -10,7 +10,8 @@ No Home Assistant integration (`truma_inetx`) and no Bluetooth proxy needed.
 
 > **Status: public beta 0.8.6 (November 2026) – testers wanted!**
 > Tested with an iNet X Pro panel (software 3.4.27), a Combi 6 heater and a Schaudt EBL; by testers
-> also with panel software 3.5.38, Combi D 4 GEN2, Aventa compact and a Nordelettronica NE315 Gen2.
+> also with panel software 3.5.38, Combi D 4 GEN2, Combi 4 D E, Aventa compact, Aventa Compact Plus
+> 2nd gen and a Nordelettronica NE315 Gen2.
 > With a **classic ESP32** (ESP32-D0WD) the connection is stable (long-term tests of 30 hours
 > and more). The ESP32-C3 is not supported, see [Hardware](#hardware).
 >
@@ -132,6 +133,9 @@ What remains are quirks of the **panel itself**:
 ## Hardware
 
 - **Classic ESP32** (ESP32-WROOM / "ESP32 DevKit", `board: esp32dev`)
+  Tested boards: ESP32 DevKit (ESP32-D0WD), ESP32-WROOM-32U with external antenna,
+  AZ-Delivery D1 Mini ESP32 (ESP32-WROOM-32). Single boards can have faulty Bluetooth –
+  see Troubleshooting.
 
 > **Important:** With the **ESP32-C3** (and probably S3/C6) pairing and data work, but
 > **reconnecting** after a drop does not. The Bluetooth stack of these chips looks up bonded
