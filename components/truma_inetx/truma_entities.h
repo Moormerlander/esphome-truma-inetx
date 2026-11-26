@@ -387,14 +387,14 @@ class TrumaClimate : public climate::Climate, public TrumaListener {
         return climate::CLIMATE_MODE_OFF;
     }
   }
-  static int32_t from_mode_(climate::ClimateMode m) {
+  int32_t from_mode_(climate::ClimateMode m) {
     switch (m) {
       case climate::CLIMATE_MODE_AUTO:
         return 1;
       case climate::CLIMATE_MODE_COOL:
         return 2;
       case climate::CLIMATE_MODE_HEAT:
-        return 3;
+        return this->appliance_ == 0x0801 ? 4 : 3;
       case climate::CLIMATE_MODE_FAN_ONLY:
         return 5;
       case climate::CLIMATE_MODE_DRY:
